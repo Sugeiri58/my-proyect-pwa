@@ -1,11 +1,11 @@
 // workbox-config.js
 module.exports = {
-  // 👇 ¡Siempre sobre los archivos construidos!
+  //  ¡Siempre sobre los archivos construidos!
   globDirectory: 'dist/',
   globPatterns: [
     '**/*.{html,js,css,png,svg,ico,json,jpg,jpeg,webp,woff2}'
   ],
-  // 👇 El SW se genera en dist y se sirve como /service-worker.js
+  //  El SW se genera en dist y se sirve como /service-worker.js
   swDest: 'dist/service-worker.js',
 
   // App Shell: si falla la navegación, sirve index.html desde caché
