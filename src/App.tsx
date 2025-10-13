@@ -1,49 +1,56 @@
 import './App.css'
+import EntryForm from './components/EntryForm'
+import EntriesPage from './pages/EntriesPage'
+import { useEffect, useState } from 'react'
+
+function OnlineBadge() {
+  const [online, setOnline] = useState(navigator.onLine)
+  useEffect(() => {
+    const on = () => setOnline(true)
+    const off = () => setOnline(false)
+    window.addEventListener('online', on)
+    window.addEventListener('offline', off)
+    return () => {
+      window.removeEventListener('online', on)
+      window.removeEventListener('offline', off)
+    }
+  }, [])
+  return (
+    <div style={{ position: 'fixed', right: 12, bottom: 12, padding: '6px 10px',
+      borderRadius: 8, background: online ? '#1b5e20' : '#7b1fa2', color: '#fff', fontSize: 12 }}>
+      {online ? 'Online' : 'Offline'}
+    </div>
+  )
+}
 
 function App() {
   return (
     <div className="app-container">
-      {/* Header fijo */}
       <header className="app-header">
         <img src="/icons/icon-192.png" alt="Logo VinylBeat" width={32} height={32} />
         <h1>VinylBeat</h1>
       </header>
 
-      {/* Sección principal (Hero) */}
       <main>
         <section className="hero">
           <h2>Descubre la música que nunca pasa de moda</h2>
           <p>Explora nuestros discos de colección y revive los mejores clásicos.</p>
         </section>
 
-        {/* Grid de discos destacados */}
-        <section className="grid">
-        <article className="card">
-          <figure className="cover">
-            <img src="/assets/beatles.jpeg" alt="Abbey Road" loading="lazy" />
-          </figure>
-          <h3>The Beatles – Abbey Road</h3>
-        </article>
+        {/* ---- Nuevo: Form offline + listado desde IndexedDB ---- */}
+        <EntryForm />
 
-        <article className="card">
-          <figure className="cover">
-            <img src="/assets/Bad.png" alt="Michael Jackson – Bad" loading="lazy" />
-          </figure>
-          <h3>Michael Jackson – Bad</h3>
-        </article>
-        <article className="card">
-          <figure className="cover">
-            <img src="/assets/queen.jpeg" alt="A Night at the Opera" loading="lazy" />
-          </figure>
-          <h3>Queen – A Night at the Opera</h3>
-        </article>
-      </section>
+        <h3 style={{ margin: '8px 20px' }}>Mis entradas (IndexedDB)</h3>
+        <EntriesPage />
+
+        {/* Tu grid de discos puede seguir aquí si quieres */}
       </main>
 
-      {/* Footer */}
       <footer>
         © 2025 VinylBeat — Todos los derechos reservados
       </footer>
+
+      <OnlineBadge />
     </div>
   )
 }
