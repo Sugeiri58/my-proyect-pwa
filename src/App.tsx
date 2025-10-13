@@ -2,6 +2,7 @@ import './App.css'
 import EntryForm from './components/EntryForm'
 import EntriesPage from './pages/EntriesPage'
 import { useEffect, useState } from 'react'
+import { askPermission, subscribePush } from './lib/push';
 
 function OnlineBadge() {
   const [online, setOnline] = useState(navigator.onLine)
@@ -53,6 +54,17 @@ function App() {
       <OnlineBadge />
     </div>
   )
+}
+function PushButton() {
+  async function enable() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      alert('Push no soportado'); return;
+    }
+    if (!(await askPermission())) { alert('Permiso denegado'); return; }
+    await subscribePush(import.meta.env.VITE_VAPID_PUBLIC || '<TU_PUBLIC_VAPID_KEY_BASE64URL>');
+    alert('Suscripción creada. Abre /api/test-push para probar.');
+  }
+  return <button onClick={enable} style={{ margin: '8px 20px' }}>Habilitar notificaciones</button>;
 }
 
 export default App
