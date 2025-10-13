@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import webpush from 'web-push';
-import { subscribers } from './subscribe';
+import { subscribers } from './subscribe.js';
 
 webpush.setVapidDetails(
   'mailto:you@example.com',
