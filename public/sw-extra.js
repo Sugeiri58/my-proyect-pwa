@@ -15,7 +15,7 @@
 //  }
 //});
 
-// ---------- Background Sync: vaciar cola 'outbox' de IndexedDB ----------
+// ---------- Background Sync ----------
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-entries') {
     event.waitUntil(flushOutbox());
@@ -35,7 +35,6 @@ async function openDB() {
     req.onerror = () => reject(req.error);
   });
 }
-
 async function getAll(store) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
@@ -45,7 +44,6 @@ async function getAll(store) {
     req.onerror = () => reject(req.error);
   });
 }
-
 async function deleteIds(store, ids) {
   const db = await openDB();
   const tx = db.transaction(store, 'readwrite');
@@ -53,7 +51,6 @@ async function deleteIds(store, ids) {
   ids.forEach(id => os.delete(id));
   return tx.done;
 }
-
 async function flushOutbox() {
   const items = await getAll('outbox');
   const sent = [];
@@ -70,7 +67,7 @@ async function flushOutbox() {
   if (sent.length) await deleteIds('outbox', sent);
 }
 
-// --------------------- Push notifications ---------------------
+// ---------- Push ----------
 self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {};
   const title = data.title || 'VinylBeat';
@@ -87,22 +84,3 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(clients.openWindow('/'));
 });
-
-// 1) NO interceptar las llamadas a /api/* (van directo a la red)
-workbox.routing.registerRoute(
-  ({url}) => url.pathname.startsWith('/api/'),
-  new workbox.strategies.NetworkOnly(), // o NetworkFirst si quieres caché de fallback
-  'GET'
-);
-
-// 2) Interceptar SOLO navegaciones que NO sean /api/*
-workbox.routing.registerRoute(
-  ({request, url}) => request.mode === 'navigate' && !url.pathname.startsWith('/api/'),
-  new workbox.strategies.NetworkFirst({
-    cacheName: 'pages',
-  })
-);
-
-// 3) (si usas página offline) sigue tu handler de offline aquí, pero
-//    recuerda que la denylist de /api/ ya evita que se aplique a esas rutas.
-
