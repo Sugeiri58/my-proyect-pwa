@@ -2,7 +2,7 @@ import './App.css'
 import EntryForm from './components/EntryForm'
 import EntriesPage from './pages/EntriesPage'
 import { useEffect, useState } from 'react'
-import { askPermission, subscribePush } from './lib/push';
+import { ensureSubscribed } from './lib/push'
 
 function OnlineBadge() {
   const [online, setOnline] = useState(navigator.onLine)
@@ -17,14 +17,39 @@ function OnlineBadge() {
     }
   }, [])
   return (
-    <div style={{ position: 'fixed', right: 12, bottom: 12, padding: '6px 10px',
-      borderRadius: 8, background: online ? '#1b5e20' : '#7b1fa2', color: '#fff', fontSize: 12 }}>
+    <div style={{
+      position: 'fixed', right: 12, bottom: 12, padding: '6px 10px',
+      borderRadius: 8, background: online ? '#1b5e20' : '#7b1fa2',
+      color: '#fff', fontSize: 12
+    }}>
       {online ? 'Online' : 'Offline'}
     </div>
   )
 }
 
+function PushButton() {
+  async function onClick() {
+    try {
+      const key = import.meta.env.VITE_VAPID_PUBLIC
+      console.log('[push] VITE_VAPID_PUBLIC =', key)
+      if (!key) { alert('Falta VITE_VAPID_PUBLIC'); return }
+      await ensureSubscribed(key)
+      alert('Suscripción registrada. Ahora abre /api/test-push')
+    } catch (e:any) {
+      console.error(e)
+      alert('No se pudo suscribir: ' + e.message)
+    }
+  }
+  return <button onClick={onClick} style={{ margin: '8px 20px' }}>Habilitar notificaciones</button>
+}
+
 function App() {
+  // Solo para depurar: ver la clave en consola/ventana
+  useEffect(() => {
+    (window as any).__VAPID__ = import.meta.env.VITE_VAPID_PUBLIC
+    console.log('VAPID pública (cliente):', (window as any).__VAPID__)
+  }, [])
+
   return (
     <div className="app-container">
       <header className="app-header">
@@ -38,33 +63,19 @@ function App() {
           <p>Explora nuestros discos de colección y revive los mejores clásicos.</p>
         </section>
 
-        {/* ---- Nuevo: Form offline + listado desde IndexedDB ---- */}
-        <EntryForm />
+        {/* Botón para suscribirse a Push */}
+        <PushButton />
 
+        {/* Form offline + listado */}
+        <EntryForm />
         <h3 style={{ margin: '8px 20px' }}>Mis entradas (IndexedDB)</h3>
         <EntriesPage />
-
-        {/* Tu grid de discos puede seguir aquí si quieres */}
       </main>
 
-      <footer>
-        © 2025 VinylBeat — Todos los derechos reservados
-      </footer>
-
+      <footer>© 2025 VinylBeat — Todos los derechos reservados</footer>
       <OnlineBadge />
     </div>
   )
-}
-function PushButton() {
-  async function enable() {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      alert('Push no soportado'); return;
-    }
-    if (!(await askPermission())) { alert('Permiso denegado'); return; }
-    await subscribePush(import.meta.env.VITE_VAPID_PUBLIC || '<TU_PUBLIC_VAPID_KEY_BASE64URL>');
-    alert('Suscripción creada. Abre /api/test-push para probar.');
-  }
-  return <button onClick={enable} style={{ margin: '8px 20px' }}>Habilitar notificaciones</button>;
 }
 
 export default App
