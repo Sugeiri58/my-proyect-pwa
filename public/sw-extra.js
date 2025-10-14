@@ -87,3 +87,22 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(clients.openWindow('/'));
 });
+
+// 1) NO interceptar las llamadas a /api/* (van directo a la red)
+workbox.routing.registerRoute(
+  ({url}) => url.pathname.startsWith('/api/'),
+  new workbox.strategies.NetworkOnly(), // o NetworkFirst si quieres caché de fallback
+  'GET'
+);
+
+// 2) Interceptar SOLO navegaciones que NO sean /api/*
+workbox.routing.registerRoute(
+  ({request, url}) => request.mode === 'navigate' && !url.pathname.startsWith('/api/'),
+  new workbox.strategies.NetworkFirst({
+    cacheName: 'pages',
+  })
+);
+
+// 3) (si usas página offline) sigue tu handler de offline aquí, pero
+//    recuerda que la denylist de /api/ ya evita que se aplique a esas rutas.
+
