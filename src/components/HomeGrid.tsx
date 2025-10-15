@@ -7,7 +7,7 @@ export default function HomeGrid() {
     },
     {
       title: "Michael Jackson – BAD",
-      img: "./assets/mj-bad.png",
+      img: "./assets/Bad.png",
     },
     {
       title: "Queen – A Night at the Opera",
