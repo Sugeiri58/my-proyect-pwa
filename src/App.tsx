@@ -2,9 +2,9 @@
 import "./App.css";
 import EntryForm from "./components/EntryForm";
 import { useEffect, useState } from "react";
-import abbey from './assets/abbey-road.jpg';
-import mjBad from './assets/mj-bad.jpg';
-import queenAnato from './assets/queen-anato.jpg';
+import abbey from './assets/beatles.jpeg';
+import mjBad from './assets/Bad.jpg';
+import queenAnato from './assets/queen.jpeg';
 
 
 /* ---------- Badge de estado de red (TU CÓDIGO ORIGINAL) ---------- */
