@@ -2,6 +2,10 @@
 import "./App.css";
 import EntryForm from "./components/EntryForm";
 import { useEffect, useState } from "react";
+import abbey from './assets/abbey-road.jpg';
+import mjBad from './assets/mj-bad.jpg';
+import queenAnato from './assets/queen-anato.jpg';
+
 
 /* ---------- Badge de estado de red (TU CÓDIGO ORIGINAL) ---------- */
 function OnlineBadge() {
@@ -38,9 +42,9 @@ function OnlineBadge() {
 function HomeGrid() {
   // Ajusta estas rutas a tus imágenes reales
   const albums = [
-    { title: "The Beatles – Abbey Road", img: "./assets/abbey-road.jpg" },
-    { title: "Michael Jackson – BAD", img: "./assets/mj-bad.png" },
-    { title: "Queen – A Night at the Opera", img: "./assets/queen-anato.jpg" },
+    { title: "The Beatles – Abbey Road", img: abbey },
+    { title: "Michael Jackson – BAD", img: mjBad },
+    { title: "Queen – A Night at the Opera", img: queenAnato},
   ];
 
   return (
