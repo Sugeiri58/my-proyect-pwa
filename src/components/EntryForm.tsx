@@ -32,14 +32,26 @@ export default function EntryForm() {
         throw new Error('offline');
       }
     } catch {
-      // 3) Cola para Background Sync
-      await queueOutbox(payload);
-      if ('serviceWorker' in navigator && 'SyncManager' in window) {
-        const reg = await navigator.serviceWorker.ready;
-        await reg.sync.register('sync-entries');
-      }
-      setStatus('Sin conexión: se sincronizará cuando vuelva la red');
+  // 3) Cola para Background Sync
+  await queueOutbox(payload);
+
+  if ('serviceWorker' in navigator) {
+    const reg = await navigator.serviceWorker.ready;
+
+    // comprobamos de forma segura y casteamos para TS
+    if ('sync' in (reg as any)) {
+      await (reg as any).sync.register('sync-entries');
+      console.log('[app] Background Sync registrado');
+    } else {
+      // Fallback: pedir al SW que intente flush cuando haya red
+      reg.active?.postMessage({ type: 'FLUSH_OUTBOX' });
+      console.log('[app] Sync no soportado, uso fallback por mensaje');
     }
+  }
+
+  setStatus('Sin conexión: se sincronizará cuando vuelva la red');
+}
+
 
     setTitle('');
     setNotes('');
