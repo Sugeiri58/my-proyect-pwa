@@ -183,3 +183,5 @@ footer {
 
 .status{ margin-top: 4px; color: #d7d7df; font-size: 14px; }
 footer{ padding: 24px; text-align:center; color: var(--muted); border-top: 2px solid #29292f; }
+
+html { scroll-behavior: smooth; }
