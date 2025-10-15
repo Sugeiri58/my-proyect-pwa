@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { addEntry, queueOutbox } from '../../lib/db';
+import { addEntry, queueOutbox } from '../lib/db';
 
 async function sendToServer(payload: any) {
   // TODO: reemplazar por tu endpoint real
