@@ -3,7 +3,7 @@ import "./App.css";
 import EntryForm from "./components/EntryForm";
 import { useEffect, useState } from "react";
 import abbey from './assets/beatles.jpeg';
-import mjBad from './assets/Bad.jpg';
+import mjBad from './assets/Bad.png';
 import queenAnato from './assets/queen.jpeg';
 
 
