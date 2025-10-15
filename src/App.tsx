@@ -38,9 +38,9 @@ function OnlineBadge() {
 function HomeGrid() {
   // Ajusta estas rutas a tus imágenes reales
   const albums = [
-    { title: "The Beatles – Abbey Road", img: "/assets/abbey-road.jpg" },
-    { title: "Michael Jackson – BAD", img: "/assets/mj-bad.png" },
-    { title: "Queen – A Night at the Opera", img: "/assets/queen-anato.jpg" },
+    { title: "The Beatles – Abbey Road", img: "./assets/abbey-road.jpg" },
+    { title: "Michael Jackson – BAD", img: "./assets/mj-bad.png" },
+    { title: "Queen – A Night at the Opera", img: "./assets/queen-anato.jpg" },
   ];
 
   return (
