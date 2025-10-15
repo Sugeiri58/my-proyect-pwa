@@ -1,86 +1,65 @@
-// ----- Offline fallback para navegaciones si la red falla -----
-//self.addEventListener('fetch', (event) => {
-//  if (event.request.mode === 'navigate') {
-//    event.respondWith((async () => {
-//      try { return await fetch(event.request); }
-//      catch (e) {
-//        // Intenta offline.html, si no existe usa index.html del precache
-//        const cache = await caches.open('static-swr');
-//        const offline = await cache.match('/offline.html');
-//        if (offline) return offline;
-//        const idx = await caches.match('/index.html');
-//        return idx || Response.error();
-//      }
-//    })());
-//  }
-//});
+const DB_NAME = 'vinylbeat-db';
+const DB_VERSION = 1;
+const STORE_OUTBOX = 'outbox';
 
-// ---------- Background Sync ----------
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-entries') {
-    event.waitUntil(flushOutbox());
-  }
-});
-
-async function openDB() {
+function openDB() {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open('vinylbeat-db', 1);
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
-      if (!db.objectStoreNames.contains('outbox')) {
-        db.createObjectStore('outbox', { keyPath: 'id', autoIncrement: true });
+      if (!db.objectStoreNames.contains(STORE_OUTBOX)) {
+        db.createObjectStore(STORE_OUTBOX, { keyPath: 'id', autoIncrement: true });
       }
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
 }
-async function getAll(store) {
+
+async function getAllOutbox() {
   const db = await openDB();
   return new Promise((resolve, reject) => {
-    const tx = db.transaction(store, 'readonly');
-    const req = tx.objectStore(store).getAll();
+    const tx = db.transaction(STORE_OUTBOX, 'readonly');
+    const req = tx.objectStore(STORE_OUTBOX).getAll();
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
   });
 }
-async function deleteIds(store, ids) {
+
+async function deleteIds(ids) {
   const db = await openDB();
-  const tx = db.transaction(store, 'readwrite');
-  const os = tx.objectStore(store);
-  ids.forEach(id => os.delete(id));
-  return tx.done;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_OUTBOX, 'readwrite');
+    tx.oncomplete = () => resolve(true);
+    tx.onerror = () => reject(tx.error);
+    const os = tx.objectStore(STORE_OUTBOX);
+    ids.forEach(id => os.delete(id));
+  });
 }
+
 async function flushOutbox() {
-  const items = await getAll('outbox');
+  const items = await getAllOutbox();
   const sent = [];
+
   for (const it of items) {
     try {
       const res = await fetch('/api/entries', {
         method: 'POST',
-        headers: { 'Content-Type':'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(it),
       });
       if (res.ok) sent.push(it.id);
-    } catch {}
+    } catch (e) {
+      // sigue intentando en la próxima sync
+    }
   }
-  if (sent.length) await deleteIds('outbox', sent);
+  if (sent.length) await deleteIds(sent);
 }
 
-// ---------- Push ----------
-self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : {};
-  const title = data.title || 'VinylBeat';
-  const options = {
-    body: data.body || 'Tienes novedades',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
-    data
-  };
-  event.waitUntil(self.registration.showNotification(title, options));
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-entries') event.waitUntil(flushOutbox());
 });
 
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  event.waitUntil(clients.openWindow('/'));
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'FLUSH_OUTBOX') event.waitUntil(flushOutbox());
 });

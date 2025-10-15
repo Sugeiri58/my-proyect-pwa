@@ -23,35 +23,35 @@ export default function EntryForm() {
     // 1) Guardar siempre en IndexedDB (histórico local)
     await addEntry(payload);
 
-    try {
-      // 2) Intentar enviar online
-      if (navigator.onLine) {
-        await sendToServer(payload);
-        setStatus('Guardado y sincronizado con el servidor');
-      } else {
-        throw new Error('offline');
-      }
-    } catch {
-  // 3) Cola para Background Sync
-  await queueOutbox(payload);
+  try {
+    // 2) Intentar enviar online
+    if (navigator.onLine) {
+      await sendToServer(payload);
+      setStatus('Guardado y sincronizado con el servidor');
+    } else {
+      throw new Error('offline');
+    }
+  } catch (e) {
+    console.log('[app] offline/catch → guardo en outbox…');
+    await queueOutbox(payload);
+    console.log('[app] outbox escrito OK');
 
-  if ('serviceWorker' in navigator) {
-    const reg = await navigator.serviceWorker.ready;
+    if ('serviceWorker' in navigator) {
+  const reg = await navigator.serviceWorker.ready;
 
-    // comprobamos de forma segura y casteamos para TS
-    if ('sync' in (reg as any)) {
-      await (reg as any).sync.register('sync-entries');
+    // Background Sync si existe; si no, fallback por postMessage
+    if ('SyncManager' in window && 'sync' in reg) {
+      await (reg as any).sync.register('sync-entries');  // ← cast
       console.log('[app] Background Sync registrado');
     } else {
-      // Fallback: pedir al SW que intente flush cuando haya red
       reg.active?.postMessage({ type: 'FLUSH_OUTBOX' });
-      console.log('[app] Sync no soportado, uso fallback por mensaje');
+      console.log('[app] Fallback → FLUSH_OUTBOX enviado al SW');
     }
   }
 
-  setStatus('Sin conexión: se sincronizará cuando vuelva la red');
-}
 
+    setStatus('Sin conexión: se sincronizará cuando vuelva la red');
+  }
 
     setTitle('');
     setNotes('');
