@@ -2,7 +2,7 @@ import './App.css'
 import EntryForm from './components/EntryForm'
 import EntriesPage from './pages/EntriesPage'
 import { useEffect, useState } from 'react'
-import { ensureSubscribed } from './lib/push'
+import { ensureSubscribed } from '../lib/push'
 
 function OnlineBadge() {
   const [online, setOnline] = useState(navigator.onLine)

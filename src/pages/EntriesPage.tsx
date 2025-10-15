@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { listEntries } from '../lib/db';
+import { listEntries } from '../../lib/db';
 
 export default function EntriesPage() {
   const [items, setItems] = useState<any[]>([]);
