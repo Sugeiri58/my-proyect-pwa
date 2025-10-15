@@ -1,6 +1,6 @@
 // api/entries.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { db } from '../lib/firebase-admin';
+import { db } from '../lib/firebase-admin.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Cache-Control', 'no-store');
