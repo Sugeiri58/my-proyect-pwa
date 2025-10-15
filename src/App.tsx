@@ -3,6 +3,7 @@ import "./App.css";
 import EntryForm from "./components/EntryForm";
 import { useEffect, useState } from "react";
 
+/* ---------- Badge de estado de red (TU CÓDIGO ORIGINAL) ---------- */
 function OnlineBadge() {
   const [online, setOnline] = useState(navigator.onLine);
   useEffect(() => {
@@ -33,7 +34,38 @@ function OnlineBadge() {
   );
 }
 
+/* ---------- Grid de discos en la Home (NUEVO, inline para no tocar tu estructura) ---------- */
+function HomeGrid() {
+  // Ajusta estas rutas a tus imágenes reales
+  const albums = [
+    { title: "Los Beatles – Abbey Road", img: "/assets/abbey-road.jpg" },
+    { title: "Michael Jackson – Malo", img: "/assets/mj-bad.jpg" },
+    { title: "Reina – Una noche en la ópera", img: "/assets/queen-anato.jpg" },
+  ];
+
+  return (
+    <section className="grid-section" aria-label="Destacados">
+      <div className="grid">
+        {albums.map((a) => (
+          <article key={a.title} className="card">
+            <img src={a.img} alt={a.title} loading="lazy" />
+            <h3>{a.title}</h3>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---------- App (TU ESTRUCTURA, con CTA y el grid antes del formulario) ---------- */
 export default function App() {
+  // Scroll suave al formulario
+  const openForm = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const el = document.getElementById("form");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div className="app-container">
       <header className="app-header">
@@ -42,18 +74,24 @@ export default function App() {
       </header>
 
       <main>
+        {/* Sección hero (TU CÓDIGO + botón CTA) */}
         <section className="hero">
           <h2>Descubre la música que nunca pasa de moda</h2>
           <p>Explora nuestros discos de colección y revive los mejores clásicos.</p>
 
           {/* CTA que te lleva al formulario */}
-          <a href="#form" className="btn-ghost">
-            Añadir nota offline
+          <a href="#form" className="btn-ghost" onClick={openForm}>
+            Añadir nota sin conexión
           </a>
         </section>
 
-        {/* Solo el formulario (sin Entries list ni botón de notificaciones) */}
-        <EntryForm />
+        {/* GRID en la home (nuevo) */}
+        <HomeGrid />
+
+        {/* Formulario (tu componente), envuelto con un id para el ancla */}
+        <section id="form" style={{ scrollMarginTop: 80 }}>
+          <EntryForm />
+        </section>
       </main>
 
       <footer>© 2025 VinylBeat — Todos los derechos reservados</footer>

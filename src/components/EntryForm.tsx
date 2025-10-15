@@ -31,7 +31,7 @@ export default function EntryForm() {
     try {
       if (navigator.onLine) {
         await sendToServer(payload);
-        setStatus("✅ Guardado en el servidor");
+        setStatus("Guardado en el servidor");
       } else {
         throw new Error("offline");
       }
