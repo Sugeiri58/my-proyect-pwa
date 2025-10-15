@@ -3,15 +3,15 @@ export default function HomeGrid() {
   const albums = [
     {
       title: "The Beatles – Abbey Road",
-      img: "/assets/beatles.jpeg", // ajusta la ruta
+      img: "./assets/beatles.jpeg", // ajusta la ruta
     },
     {
       title: "Michael Jackson – BAD",
-      img: "/assets/mj-bad.png",
+      img: "./assets/mj-bad.png",
     },
     {
       title: "Queen – A Night at the Opera",
-      img: "/assets/queen.jpeg",
+      img: "./assets/queen.jpeg",
     },
   ];
 
