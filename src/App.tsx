@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import abbey from './assets/beatles.jpeg';
 import mjBad from './assets/Bad.png';
 import queenAnato from './assets/queen.jpeg';
-
+import { ensureSubscribed } from "../lib/push";
 
 /* ---------- Badge de estado de red (TU CÓDIGO ORIGINAL) ---------- */
 function OnlineBadge() {
@@ -61,6 +61,24 @@ function HomeGrid() {
   );
 }
 
+/* ---------- Componente para suscripción a notificaciones ---------- */
+async function subscribeToPush() {
+  try {
+    const key = import.meta.env.VITE_VAPID_PUBLIC;  // Tu clave pública VAPID
+    if (!key) {
+      alert("Falta la clave pública VAPID");
+      return;
+    }
+
+    // Asegúrate de tener la función 'ensureSubscribed' en lib/push.ts
+    await ensureSubscribed(key);
+    alert("Notificación habilitada con éxito.");
+  } catch (error: any) {
+    console.error(error);
+    alert("No se pudo habilitar las notificaciones: " + error.message);
+  }
+}
+
 /* ---------- App (TU ESTRUCTURA, con CTA y el grid antes del formulario) ---------- */
 export default function App() {
   // Scroll suave al formulario
@@ -87,6 +105,11 @@ export default function App() {
           <a href="#form" className="btn-ghost" onClick={openForm}>
             Añadir nota sin conexión
           </a>
+
+          {/* Botón para habilitar notificaciones */}
+          <button onClick={subscribeToPush} className="btn-ghost" style={{ marginTop: "20px" }}>
+            Habilitar Notificaciones Push
+          </button>
         </section>
 
         {/* GRID en la home (nuevo) */}
