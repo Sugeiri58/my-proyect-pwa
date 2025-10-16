@@ -108,7 +108,7 @@ export default function App() {
 
           {/* Botón para habilitar notificaciones */}
           <button onClick={subscribeToPush} className="btn-ghost" style={{ marginTop: "20px" }}>
-            Habilitar Notificaciones Push
+            Habilitar Notificaciones
           </button>
         </section>
 
