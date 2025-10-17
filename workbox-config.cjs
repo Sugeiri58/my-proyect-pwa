@@ -4,12 +4,12 @@ module.exports = {
   swDest: 'dist/service-worker.js',
 
   navigateFallback: '/offline.html',
-  navigateFallbackDenylist: [/^\/api\//],    // evita que /api/* caiga en offline.html
+  navigateFallbackDenylist: [/^\/api\//],    
 
   cleanupOutdatedCaches: true,
   clientsClaim: true,
   skipWaiting: true,
-  importScripts: ['sw-extra.js'],            //mantenlo para cargar el código de arriba
+  importScripts: ['sw-extra.js'],           
 
   runtimeCaching: [
     {
